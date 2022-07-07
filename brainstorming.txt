@@ -1,0 +1,74 @@
+Upon loading the site, a client has buttons to create a game or join an existing game by link, or by menu
+If they create a new game, they enter a username, and they get a link they can give to others
+If they view existing games, display all games others have created. There are buttons to select and join games
+If they join a game by link, search for that link, and if it exists, initiate a game; if not, tell them it's invalid
+
+Page layout
+Index: homepage, select option
+CreateGame: inputs for username and button to submit, check that the username isn't already taken
+ViewGames: list of usernams who have created games, and buttons to join those games
+JoinByLink: text area and button to join by inputting a link
+WaitingPage: wait to join a game, notify client when someone joins their game
+*All pages link back to homepage*
+
+
+When waiting for someone to join your game, if someone tries to join, get an alert/message with their username and options to accept or decline game. If you decline, notify them; if you accept, initiate a game
+On game page, show usernames on sides with game in middle. Play game. Keep track of score, and give both players option to rematch or go back to homepage
+
+
+Database:
+Game schema: contains usernames of players. Use ID of game to generate a link
+Functionality:
+- create game by providing a username, then return the ID/link
+- Find game by ID
+- Join game (add as second username)
+- Mark game with who won
+- Filter games by players
+Attributes:
+- ID (built-in)
+- array of usernames
+- Enum of status (waiting for 2nd player, playing, finished)
+- field for who won (null = tie)
+
+
+Sockets (client):
+If you create a new game, emit to the server the username
+- Listen for requests to join game
+If you join by link, emit to the server the link
+- Listen for response (invalid link, acceptance, refusal)
+If you view menu, emit to the server a request for created games
+- Listen for created games, then emit a game you try to join (same as by link)
+
+In-game:
+When the client clicks a square, emit to server what square they clicked
+- Listen for response of whether it's a valid square
+- Listen for game updates (new state, whose turn it is, if there's a winner, if a player disconnected)
+
+Sockets (server):
+On requests to create a new game:
+- Emit ID/link once game is created
+- Emit username of anyone trying to join game
+On requests to join by link:
+- Emit to game creator
+On acceptance/refusal:
+- Emit result to whoever is trying to join
+On requests to get all created games:
+- Emit all created (and not yet joined) games (hidden, emit ID as well as username)
+
+
+Rooms:
+- not yet assigned (users who have just joined site, or finished a game)
+- creators (users who created a game)
+- game-requesters (users who requested all games)
+- joiners (users who join by link/selection)
+- players (users playing each other)
+
+
+
+Later on:
+- Logout a user that doesn't have a username on their cookie anymore
+- Functionality to keep playing
+- view score against certain players
+- view all a users' games
+- In-game chat
+- If someone is already in a game, give them the option to re-wait or re-join that game
