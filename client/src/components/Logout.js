@@ -6,11 +6,9 @@ export default function Logout(props) {
 
     return (
         <button className=" col-1 logout-button btn btn-large btn-danger" id="logout-button" onClick={event => {
-            console.log("clicked");
             event.preventDefault();
             fetchEndpoint("/api/logout")
             .then(data => {
-                console.log("Res: " + data);
                 if (data.result === "success") {
                     navigate("/");
                 } else {
