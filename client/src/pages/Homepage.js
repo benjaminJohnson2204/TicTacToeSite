@@ -18,7 +18,7 @@ export default function Homepage(props) {
             {error && <div className="text-danger">Please enter a username</div>}
             <EnterUsername onSubmit={event => {
                     event.preventDefault(); 
-                    fetch("/login?username=" + event.target[0].value, {
+                    fetch("/api/login?username=" + event.target[0].value, {
                         credentials : "include"
                     })
                     .then(res => res.json())

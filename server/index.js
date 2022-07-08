@@ -23,76 +23,16 @@ const { addUserToGame, createGame, userInGame, joinRandomGame, findGameByID, ins
 
 app.use(cookieParser());
 
+app.use(express.static(path.resolve(__dirname, "../client/build")));
+
+app.use("/api", require("../routes"));
+
+app.get("/", (req, res) => {
+        res.sendFile(path.resolve(__dirname, "../client/build", "index.html"));
+    });
 
 
-app.use("/test", require("../routes/waiting"));
 
-app.get("/login", async (req, res) => {
-    if (req.query.username) {
-        let user = await findUserByUsername(req.query.username);
-        if (user) {
-            res.cookie("username", user.username, {maxAge : 3600_000});
-            res.cookie("userID", user._id.toString(), {maxAge : 3600_000});
-            res.json({ "isNewUser" : false, "user" : user })
-        } else {
-            user = await addUser(req.query.username);
-            res.cookie("username", user.username, {maxAge : 3600_000});
-            res.cookie("userID", user._id.toString(), {maxAge : 3600_000});
-            res.json({ "isNewUser" : true, "user" : user })
-        }
-    } else {
-        res.json({ "error" : true });
-    }
-});
-
-app.get("/create", async (req, res) => {
-    let user = await findUserByUsername(req.cookies.username);
-    let inGame = await userInGame(user._id);
-    if (inGame) {
-        res.json({ "error" : "already in game" });
-    } else {
-        let game = await createGame(user._id);
-        if (game) {
-            res.json({ "code" : game._id });
-        } else {
-            res.json({ "error" : "Could not create game" });
-        }
-    }
-});
-
-app.get("/random", async (req, res) => {
-    let user = await findUserByUsername(req.cookies.username);
-    let inGame = await userInGame(user._id);
-    if (inGame) {
-        res.json({ "error" : "already in game" });
-    } else {
-        let game = await joinRandomGame(user._id);
-        if (game) {
-            res.json({ "game" : game._id });
-        } else {
-            res.json({ "error" : "Could not create game" });
-        }
-    }
-});
-
-app.get("/code/:code", async (req, res) => {
-    let user = await findUserByUsername(req.cookies.username);
-    let inGame = await userInGame(user._id);
-    if (inGame) {
-        res.json({ "error" : "already in game" });
-    } else {
-        let game = await addUserToGame(req.params.code, user._id);
-        if (game) {
-            res.json({ "game" : game._id });
-        } else {
-            res.json({ "error" : "Could not create game" });
-        }
-    }
-});
-
-app.get("/logout", (req, res) => {
-    res.clearCookie("username");
-})
 
 io.of("/waiting").on("connection", socket => {
     socket.on("join", message => {
@@ -138,19 +78,6 @@ io.of("/play").on("connection", socket => {
 })
 
 
-if (process.env.NODE_ENV == "development") {
-    app.use(express.static(path.resolve(__dirname, "../client/build")));
-
-    app.get("/", (req, res) => {
-        res.sendFile(path.resolve(__dirname, "../client/public", "index.html"));
-    });
-} else {
-    app.use(express.static(path.resolve(__dirname, "../client/build")));
-
-    app.get("/", (req, res) => {
-        res.sendFile(path.resolve(__dirname, "../client/build", "index.html"));
-    })
-}
 
 
 server.listen(PORT, () => {
