@@ -10,6 +10,7 @@ const findGamesByUser = async (userID, filters) => {
         return games;
     } catch (error) {
         console.error(error.message);
+        console.trace();
         return false;
     }
 };
@@ -24,15 +25,18 @@ const findGameByID = async gameID => {
         }
     } catch (error) {
         console.error(error.message);
+        console.trace();
         return false;
     }
 };
 
 const joinRandomGame = async (userID) => {
     try {
-        return await addUserToGame(Game.findOne({status : Status.WAITING})._id, userID);
+        let randomGame = await Game.findOne({ status : Status.WAITING}).exec();
+        return randomGame && await addUserToGame(randomGame._id, userID);
     } catch (error) {
         console.error(error.message);
+        console.trace();
         return false;
     }
 };
@@ -42,9 +46,10 @@ const userInGame = async (userID) => {
         let usersGames = await findGamesByUser(userID, {
             $or : [{status : Status.PLAYING}, {status : Status.WAITING}]
         });
-        return usersGames.length > 0;
+        return usersGames[0];
     } catch (error) {
         console.error(error.message);
+        console.trace();
         return false;
     }
 };
@@ -64,6 +69,7 @@ const createGame = async (userID) => {
         return game;
     } catch (error) {
         console.error(error.message);
+        console.trace();
         return false;
     }
 };
@@ -87,6 +93,7 @@ const addUserToGame = async (gameID, userID) => {
         }
     } catch (error) {
         console.error(error.message);
+        console.trace();
         return false;
     }
 };
@@ -97,6 +104,7 @@ const isSquareAvailable = async (gameID, row, col) => {
         return !game.squares[3 * row + col];
     } catch (error) {
         console.error(error.message);
+        console.trace();
         return false;
     }
 };
@@ -112,6 +120,7 @@ const insertSquare = async (gameID, userID, row, col) => {
         return game;
     } catch (error) {
         console.error(error.message);
+        console.trace();
         return false;
     }
 };
@@ -124,6 +133,7 @@ const switchTurns = async gameID => {
         return game;
     } catch (error) {
         console.error(error.message);
+        console.trace();
         return false;
     }
 };
@@ -158,6 +168,7 @@ const checkForWinner = async gameID => {
         return game;
     } catch (error) {
         console.error(error.message);
+        console.trace();
         return false;
     }
 }
@@ -182,10 +193,21 @@ const setGameWinner = async (gameID, winner) => {
         }
     } catch (error) {
         console.error(error.message);
+        console.trace();
         return false;
     }
 };
 
+const deleteGame = async (gameID) => {
+    try {
+        return await Game.findByIdAndDelete(gameID).exec();
+    } catch (error) {
+        console.error(error.message);
+        console.trace();
+        return false;
+    }
+}
+
 module.exports = {
-    findGamesByUser, findGameByID, joinRandomGame, userInGame, insertSquare, isSquareAvailable, switchTurns, checkForTie, checkForWinner, createGame, addUserToGame, setGameWinner
+    findGamesByUser, findGameByID, joinRandomGame, userInGame, insertSquare, isSquareAvailable, switchTurns, checkForTie, checkForWinner, createGame, addUserToGame, setGameWinner, deleteGame
 };

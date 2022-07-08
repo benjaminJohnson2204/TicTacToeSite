@@ -5,7 +5,7 @@ export default function Logout(props) {
     const navigate = useNavigate();
 
     return (
-        <button className=" col-1 logout-button btn btn-large btn-danger" id="logout-button" onClick={event => {
+        <button className="logout-button btn btn-large btn-danger" id="logout-button" onClick={event => {
             event.preventDefault();
             fetchEndpoint("/api/logout")
             .then(data => {

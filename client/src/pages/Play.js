@@ -52,7 +52,7 @@ function Play(props) {
                 <div className="row columns">
                     <div className="button">
                         {game.winnerID == userID && <h2 className="victor">Winner!</h2>}
-                        {username} (you)
+                        <h1>{username} (you)</h1>
                         <h2 className="subtitle">
                             {game.firstPlayer === userID ? "X" : "O" /* X always moves first*/}
                         </h2>
@@ -79,7 +79,7 @@ function Play(props) {
                     </div>
                     <div className="button">
                         {game.userIDs.includes(game.winnerID) && game.winnerID != userID && <h2 className="victor">Winner!</h2>}
-                        {game.usernames.filter(uname => uname != username)[0]} (opponent)
+                        <h1>{game.usernames.filter(uname => uname != username)[0]} (opponent)</h1>
                         <h2 className="subtitle">
                             {game.firstPlayer === userID ? "O" : "X"}
                         </h2>

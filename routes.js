@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const { findUserByUsername, addUser } = require("./db/services/user");
-const { addUserToGame, createGame, userInGame, joinRandomGame, findGameByID, insertSquare, switchTurns, checkForWinner, isSquareAvailable, checkForTie } = require("./db/services/game");
+const { addUserToGame, createGame, userInGame, joinRandomGame, findGameByID, insertSquare, switchTurns, checkForWinner, isSquareAvailable, checkForTie, deleteGame } = require("./db/services/game");
 
 router.get("/login", async (req, res) => {
     if (req.query.username) {
@@ -39,13 +39,13 @@ router.get("/random", async (req, res) => {
     let user = await findUserByUsername(req.cookies.username);
     let inGame = await userInGame(user._id);
     if (inGame) {
-        res.json({ "error" : "already in game" });
+        res.json({ "error" : "Sorry, you are already in a game!" });
     } else {
         let game = await joinRandomGame(user._id);
         if (game) {
             res.json({ "game" : game._id });
         } else {
-            res.json({ "error" : "Could not create game" });
+            res.json({ "error" : "Sorry, there are no available games" });
         }
     }
 });
@@ -64,6 +64,17 @@ router.get("/code/:code", async (req, res) => {
         }
     }
 });
+
+router.get("/cancel", async (req, res) => {
+    let user = await findUserByUsername(req.cookies.username);
+    let game = await userInGame(user._id);
+    game = await deleteGame(game._id);
+    if (game) {
+        res.json({ "result" : "success" })
+    } else {
+        res.json({ "result" : "error" });
+    }
+})
 
 router.get("/logout", (req, res) => {
     try {

@@ -1,6 +1,6 @@
 const chai = require("chai");
 const { Status } = require("../db/models/game");
-const { createGame, addUserToGame, userInGame, isSquareAvailable, insertSquare, switchTurns, checkForWinner, checkForTie } = require("../db/services/game");
+const { createGame, addUserToGame, userInGame, isSquareAvailable, insertSquare, switchTurns, checkForWinner, checkForTie, deleteGame, findGameByID, joinRandomGame } = require("../db/services/game");
 const { addUser } = require("../db/services/user");
 const assert = chai.assert;
 
@@ -29,8 +29,11 @@ suite("Database Tests", () => {
     });
 
     test("Detect that users are in game", async () => {
-        assert.isTrue(await userInGame(user1._id.toString()));
-        assert.isTrue(await userInGame(user2._id.toString()));
+        let user1Game = await userInGame(user1._id.toString());
+        let user2Game = await userInGame(user2._id.toString());
+        assert.isOk(user1Game);
+        assert.isOk(user2Game);
+        assert.isTrue(user1Game.equals(user2Game));
     });
 
     test("Check that squares are available", async () => {
@@ -65,6 +68,13 @@ suite("Database Tests", () => {
        assert.equal(game.winnerID, game.turn);
     });
 
+    test("Delete game", async () => {
+        game = await deleteGame(game._id);
+        assert.isOk(game);
+        game = await findGameByID(game._id);
+        assert.isNotOk(game);
+    })
+
     test("Create new game", async () => {
         game2 = await createGame(user1._id.toString());
         game2 = await addUserToGame(game2._id, user2._id.toString())
@@ -96,6 +106,12 @@ suite("Database Tests", () => {
         assert.equal(game2.status, Status.FINISHED);
         assert.isOk(game2.winnerID);
         assert.equal(game2.winnerID, "tie");
+    });
+
+    test("Join random game", async () => {
+        game = await createGame(user1._id)
+        let randomGame = await joinRandomGame(user2._id);
+        assert.isOk(randomGame);
     });
 
 });

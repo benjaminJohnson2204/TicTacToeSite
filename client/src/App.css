@@ -37,6 +37,7 @@
 
 .button {
   margin: auto;
+  text-align: center;
 }
 
 .victor {
@@ -56,7 +57,14 @@
   font-weight: lighter;
 }
 
+.homelink-button {
+  float : left;
+}
+
 .logout-button {
   float : right;
-  text-align: center;
+}
+
+.site-header { 
+  padding : 10px;
 }

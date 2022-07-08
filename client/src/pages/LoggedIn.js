@@ -40,7 +40,7 @@ function LoggedIn(props) {
         <h2 className="subtitle">
             Choose an option to start playing!
         </h2>
-        {error && <h4 className="text-danger">Sorry, you are already in a game!</h4>}
+        {error && <h4 className="text-danger">{error}</h4>}
         <div className="row columns">
             <CreateGame handleData={data => {
                     if (data.error || !data.code) {

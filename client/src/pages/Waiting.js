@@ -3,6 +3,7 @@ import { withCookies } from "react-cookie";
 import { useNavigate, useParams } from "react-router-dom";
 import io from "socket.io-client"
 import SiteHeader from "../components/SiteHeader";
+import fetchEndpoint from "../util/fetchEndpoint";
 
 
 const socket = io("/waiting");
@@ -40,6 +41,21 @@ function Waiting(props) {
             </h1>
             <div className="text">
                 Your game code is {code}. Give it to a friend so they can join your game, or wait for a random to join
+            </div>
+            <div className="button">
+                <button className="btn btn-large btn-warning" onClick={event => {
+                    event.preventDefault();
+                    fetchEndpoint("/api/cancel")
+                    .then(data => {
+                        if (data.result === "success") {
+                            navigate("/");
+                        } else {
+                            console.log("Error: cannot cancel game");
+                        }
+                    })
+                }}>
+                    Cancel
+                </button>
             </div>
         </div>
     )

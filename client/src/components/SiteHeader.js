@@ -3,9 +3,8 @@ import Logout from "./Logout";
 
 export default function SiteHeader(props) {
     return (
-        <div className="row">
+        <div className="site-header">
             <HomeLink />
-            <div className="col-10" />
             <Logout />
         </div>
     );
