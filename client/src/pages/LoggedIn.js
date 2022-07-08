@@ -1,10 +1,11 @@
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { useState } from "react";
+import { useEffect ,useState } from "react";
 import { useCookies, withCookies } from "react-cookie";
 import io from "socket.io-client";
 import CreateGame from "../components/CreateGame";
 import JoinRandomGame from "../components/JoinRandomGame";
 import JoinGameByCode from "../components/JoinGameByCode";
+import SiteHeader from "../components/SiteHeader";
 
 function LoggedIn(props) {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -27,7 +28,12 @@ function LoggedIn(props) {
         }
     };
 
+    if (!props.cookies.get("username") || !props.cookies.get("userID")) {
+        navigate("/");
+    }
+
     return <div className="page">
+        <SiteHeader />
         <h1 className="title">
                 {isNewUser == "true" ? ("Thanks for registering, " + username) : ("Welcome back, " + username)}
         </h1>

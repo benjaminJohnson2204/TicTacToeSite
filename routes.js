@@ -66,7 +66,13 @@ router.get("/code/:code", async (req, res) => {
 });
 
 router.get("/logout", (req, res) => {
-    res.clearCookie("username");
+    try {
+        res.clearCookie("username");
+        res.json({ "result" : "success"});
+    } catch (error) {
+        console.error(error.message);
+        res.json({ "result" : "error"});;
+    }
 });
 
 module.exports = router;

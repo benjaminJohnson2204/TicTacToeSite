@@ -55,3 +55,8 @@
   text-align : center;
   font-weight: lighter;
 }
+
+.logout-button {
+  float : right;
+  text-align: center;
+}

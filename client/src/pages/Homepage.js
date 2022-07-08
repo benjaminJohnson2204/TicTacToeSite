@@ -4,11 +4,18 @@ import { Link, useSearchParams, useNavigate } from "react-router-dom";
 
 import EnterUsername from "../components/EnterUsername";
 import { useEffect, useState } from "react";
+import { withCookies } from "react-cookie";
 
-export default function Homepage(props) {
+function Homepage(props) {
     const [error, setError] = useState(false);
 
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if (props.cookies.get("username") && props.cookies.get("userID")) {
+            navigate("/loggedIn?isNewUser=false");
+        }
+    });
 
     return (
         <div className="page">
@@ -33,3 +40,5 @@ export default function Homepage(props) {
         </div>
     );
 }
+
+export default withCookies(Homepage);

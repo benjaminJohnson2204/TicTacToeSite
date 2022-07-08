@@ -1,19 +1,25 @@
 import io from "socket.io-client";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { useParams, useNavigate } from "react-router";
 import { withCookies } from "react-cookie";
+import SiteHeader from "../components/SiteHeader";
 
 const socket = io("/play");
 
 function Play(props) {
     const { gameID } = useParams();
     const [game, setGame] = useState(null);
+    const navigate = useNavigate();
     const username = props.cookies.get("username");
     const userID = props.cookies.get("userID");
 
     // Only emit the join message once. Don't want to make an infinite feedback loop of 
     // sending a join message, getting an update, updating, re-rendering, sending a message, etc.
     useEffect(() => {
+        if (!username || !userID) {
+            navigate("/");
+        }
+
         socket.emit("join", { 
             id : gameID,
             username : username
@@ -24,9 +30,14 @@ function Play(props) {
         });
     }, []);
 
+    if (!username || !userID) {
+        navigate("/");
+    }
+
     if (!game) {
         return (
             <div className="page">
+                <SiteHeader />
                 <h1 className="title">Playing Tic-tac-toe</h1>
                 <h2 className="subtitle">Loading...</h2>
             </div>
@@ -35,6 +46,7 @@ function Play(props) {
 
     return (
         <div className="page">
+            <SiteHeader />
             <h1 className="title">{game.winnerID ? "Game Over" : "Playing Tic-tac-toe"}</h1>
             <h2 className="subtitle">{game.winnerID ? "" : userID === game.turn ? "Your turn" : "Opponent's turn"}</h2>
                 <div className="row columns">
