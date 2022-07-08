@@ -24,7 +24,7 @@ router.get("/create", async (req, res) => {
     let user = await findUserByUsername(req.cookies.username);
     let inGame = await userInGame(user._id);
     if (inGame) {
-        res.json({ "error" : "already in game" });
+        res.json({ "error" : "Sorry, you are already in a game" });
     } else {
         let game = await createGame(user._id);
         if (game) {
@@ -60,7 +60,7 @@ router.get("/code/:code", async (req, res) => {
         if (game) {
             res.json({ "game" : game._id });
         } else {
-            res.json({ "error" : "Could not create game" });
+            res.json({ "error" : "Could not join game" });
         }
     }
 });
