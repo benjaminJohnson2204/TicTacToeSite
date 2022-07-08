@@ -33,7 +33,12 @@ const findGameByID = async gameID => {
 const joinRandomGame = async (userID) => {
     try {
         let randomGame = await Game.findOne({ status : Status.WAITING}).exec();
-        return randomGame && await addUserToGame(randomGame._id, userID);
+        let joinedGame = await addUserToGame(randomGame._id, userID);
+        while (!joinedGame) { // Keep trying to find an available game
+            randomGame = await Game.findOne({ status : Status.WAITING}).exec();
+            joinedGame = await addUserToGame(randomGame._id, userID);
+        }
+        return joinedGame;
     } catch (error) {
         console.error(error.message);
         console.trace();
@@ -78,7 +83,13 @@ const addUserToGame = async (gameID, userID) => {
     try {
         let user = await User.findById(userID).exec();
         let game = await findGameByID(gameID);
+        if (game.status !== Status.WAITING) { // Another user is already trying to join
+            console.log("Someone is already trying to join this game");
+            return false;
+        }
         game.status = Status.PLAYING;
+        await game.save(); // Don't let other users try to join at the same time
+
         game.userIDs.push(userID);
         game.usernames.push(user.username);
         if (flipACoin()) {
