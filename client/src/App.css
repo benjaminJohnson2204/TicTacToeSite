@@ -57,6 +57,24 @@
   font-weight: lighter;
 }
 
+.mini-table {
+  
+  margin-left : auto;
+  margin-right : auto;
+  margin-top : 10px;
+  margin-bottom: 10px;
+  text-align : center;
+}
+
+.mini-box {
+  border : 2px solid darkcyan;
+  font-size : 28px;
+  height : 24px;
+  width : 24px;
+  text-align : center;
+  font-weight: lighter;
+}
+
 .homelink-button {
   float : left;
 }

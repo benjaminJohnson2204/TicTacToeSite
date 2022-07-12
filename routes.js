@@ -1,6 +1,7 @@
 const router = require("express").Router();
-const { findUserByUsername, addUser } = require("./db/services/user");
-const { addUserToGame, createGame, userInGame, joinRandomGame, findGameByID, insertSquare, switchTurns, checkForWinner, isSquareAvailable, checkForTie, deleteGame } = require("./db/services/game");
+const { findUserByUsername, addUser, findUserByID } = require("./db/services/user");
+const { addUserToGame, createGame, userInGame, joinRandomGame, findGameByID, insertSquare, switchTurns, checkForWinner, isSquareAvailable, checkForTie, deleteGame, findGamesByUser } = require("./db/services/game");
+const { Status } = require("./db/models/game");
 
 router.get("/login", async (req, res) => {
     if (req.query.username) {
@@ -19,6 +20,25 @@ router.get("/login", async (req, res) => {
         res.json({ "error" : true });
     }
 });
+
+router.get("/games", async (req, res) => {
+    let games = await findGamesByUser(req.cookies.userID, {status : Status.FINISHED});
+    let result = [];
+    for (let game of games) {
+        let opponent = await findUserByID(game.userIDs.filter(userID => userID !== req.cookies.userID)[0]);
+        let winner;
+        if (game.winnerID === "tie") {
+            winner = "Tie";
+        } else {
+            winner = await findUserByID(game.winnerID);
+        }
+        let squares = game.squares.map(id => (id === null ? "" : (id === game.firstPlayer ? "X" : "O")));
+        let data = {squares : squares, opponent : opponent.username, winner : winner.username || winner};
+
+        result.push(data);
+    }
+    res.json({"games" : result});
+})
 
 router.get("/create", async (req, res) => {
     let user = await findUserByUsername(req.cookies.username);

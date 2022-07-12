@@ -53,6 +53,9 @@ function LoggedIn(props) {
             <JoinGameByCode handleData={joinGame}/>
             
         </div>
+        <div>
+            <Link className="btn btn-large btn-warning m-5" to="/games">View your game history</Link>
+        </div>
     </div>
 }
 

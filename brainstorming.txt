@@ -68,6 +68,5 @@ Rooms:
 Later on:
 - Functionality to keep playing
 - view score against certain players
-- view all a users' games
 - In-game chat
 - If someone is already in a game, give them the option to re-wait or re-join that game

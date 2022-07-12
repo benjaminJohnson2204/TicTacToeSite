@@ -9,6 +9,7 @@ import Homepage from './pages/Homepage';
 import WaitingPage from './pages/Waiting';
 import LoggedIn from "./pages/LoggedIn"
 import Play from './pages/Play';
+import CompletedGames from './pages/CompletedGames';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
           <Route path="loggedin" element={<LoggedIn />} />
           <Route path="waiting/:code" element={<WaitingPage />} />
           <Route path="play/:gameID" element={<Play />} />
+          <Route path="games" element={<CompletedGames />} />
         </Routes>
       </Router>
     </CookiesProvider>

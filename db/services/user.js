@@ -11,6 +11,17 @@ const findUserByUsername = async (username) => {
     
 }
 
+const findUserByID = async (userID) => {
+    try {
+        let user = await User.findById(userID).exec();
+        return user;
+    } catch (error) {
+        console.error(error.message);
+        return false;
+    }
+    
+}
+
 const addUser = async (username) => {
     try {
         let user = new User({username : username});
@@ -23,5 +34,5 @@ const addUser = async (username) => {
 }
 
 module.exports = {
-    findUserByUsername, addUser
+    findUserByUsername, findUserByID, addUser
 };
