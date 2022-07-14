@@ -30,11 +30,12 @@ const { range } = require("lodash");
 
 app.use(cookieParser());
 
+app.use(express.static(path.resolve(__dirname, "../client/build")));
+
 
 app.use(bodyParser.urlencoded({ extended : true}));
 app.use(bodyParser.json());
 
-app.use(express.static(path.resolve(__dirname, "../client/build")));
 
 app.use(session({
     secret : process.env.SESSION_SECRET,
