@@ -127,5 +127,3 @@ server.listen(PORT, () => {
         testRunner.run();
     }, 3500);
 });
-
-module.exports = app;
