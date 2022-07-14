@@ -1,11 +1,16 @@
 import { useState, useEffect } from "react";
 import fetchEndpoint from "../util/fetchEndpoint";
 import SiteHeader from "../components/SiteHeader";
+import ensureAuthenticated from "../util/ensureAuthenticated";
+import { useNavigate } from "react-router";
 
 export default function CompletedGames(props) {
     const [games, setGames] = useState([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
+        ensureAuthenticated(navigate);
+
         fetchEndpoint("/api/games")
         .then(data => {
             setGames(data.games)

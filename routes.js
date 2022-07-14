@@ -1,31 +1,68 @@
 const router = require("express").Router();
+const bcrypt = require("bcrypt");
+const passport = require("passport");
+
 const { findUserByUsername, addUser, findUserByID } = require("./db/services/user");
 const { addUserToGame, createGame, userInGame, joinRandomGame, findGameByID, insertSquare, switchTurns, checkForWinner, isSquareAvailable, checkForTie, deleteGame, findGamesByUser } = require("./db/services/game");
 const { Status } = require("./db/models/game");
 
-router.get("/login", async (req, res) => {
-    if (req.query.username) {
-        let user = await findUserByUsername(req.query.username);
-        if (user) {
-            res.cookie("username", user.username, {maxAge : 3600_000});
-            res.cookie("userID", user._id.toString(), {maxAge : 3600_000});
-            res.json({ "isNewUser" : false, "user" : user })
-        } else {
-            user = await addUser(req.query.username);
-            res.cookie("username", user.username, {maxAge : 3600_000});
-            res.cookie("userID", user._id.toString(), {maxAge : 3600_000});
-            res.json({ "isNewUser" : true, "user" : user })
-        }
-    } else {
-        res.json({ "error" : true });
+const ensureAuthenticated = (req, res, next) => {
+    if (req.isAuthenticated()) {
+        return next();
     }
+    res.redirect("/api/invalid");
+}
+
+router.post("/login", passport.authenticate("local", {failureRedirect : "/api/invalid"}), (req, res) => {
+    res.cookie("isNewUser", false, {maxAge : 600_000});
+    res.json({"result" : "success"});
 });
 
-router.get("/games", async (req, res) => {
-    let games = await findGamesByUser(req.cookies.userID, {status : Status.FINISHED});
+router.get("/invalid", (req, res) => {
+    res.json({"result" : "failure"});
+})
+
+router.post("/register", async (req, res, next) => {
+    if (req.body.password != req.body.confirm) {
+        res.json({"error" : "passwords don't match"});
+        return;
+    }
+    const hash = bcrypt.hashSync(req.body.password, 12);
+    let user = await findUserByUsername(req.body.username);
+    if (user) {
+        res.json({"error" : "username already taken"});
+        return;
+    }
+    let addedUser = await addUser(req.body.username, hash)
+    if (addedUser) {
+        req.login(addedUser, error => {
+            if (error) {
+                console.log(error);
+                return next(error);
+            }
+            return next(null, addedUser);
+        });
+    } else {
+        res.json({"error" : "could not register user"});
+    }
+}, passport.authenticate("local"), (req, res) => {
+    res.cookie("isNewUser", true, {maxAge : 600_000});
+    res.json({"result" : "success"});
+});
+
+router.get("/authenticated", (req, res) => {
+    res.json({"authenticated" : req.isAuthenticated()});
+});
+
+router.get("/user", ensureAuthenticated, (req, res) => {
+    res.json({"user" : req.user});
+})
+
+router.get("/games", ensureAuthenticated, async (req, res) => {
+    let games = await findGamesByUser(req.user._id, {status : Status.FINISHED});
     let result = [];
     for (let game of games) {
-        let opponent = await findUserByID(game.userIDs.filter(userID => userID !== req.cookies.userID)[0]);
+        let opponent = await findUserByID(game.userIDs.filter(userID => userID !== req.user._id)[0]);
         let winner;
         if (game.winnerID === "tie") {
             winner = "Tie";
@@ -40,13 +77,12 @@ router.get("/games", async (req, res) => {
     res.json({"games" : result});
 })
 
-router.get("/create", async (req, res) => {
-    let user = await findUserByUsername(req.cookies.username);
-    let inGame = await userInGame(user._id);
+router.get("/create", ensureAuthenticated, async (req, res) => {
+    let inGame = await userInGame(req.user._id);
     if (inGame) {
         res.json({ "error" : "Sorry, you are already in a game" });
     } else {
-        let game = await createGame(user._id);
+        let game = await createGame(req.user._id);
         if (game) {
             res.json({ "code" : game._id });
         } else {
@@ -55,13 +91,12 @@ router.get("/create", async (req, res) => {
     }
 });
 
-router.get("/random", async (req, res) => {
-    let user = await findUserByUsername(req.cookies.username);
-    let inGame = await userInGame(user._id);
+router.get("/random", ensureAuthenticated, async (req, res) => {
+    let inGame = await userInGame(req.user._id);
     if (inGame) {
         res.json({ "error" : "Sorry, you are already in a game!" });
     } else {
-        let game = await joinRandomGame(user._id);
+        let game = await joinRandomGame(req.user._id);
         if (game) {
             res.json({ "game" : game._id });
         } else {
@@ -70,13 +105,12 @@ router.get("/random", async (req, res) => {
     }
 });
 
-router.get("/code/:code", async (req, res) => {
-    let user = await findUserByUsername(req.cookies.username);
-    let inGame = await userInGame(user._id);
+router.get("/code/:code", ensureAuthenticated, async (req, res) => {
+    let inGame = await userInGame(req.user._id);
     if (inGame) {
         res.json({ "error" : "Sorry, you are already in a game!" });
     } else {
-        let game = await addUserToGame(req.params.code, user._id);
+        let game = await addUserToGame(req.params.code, req.user._id);
         if (game) {
             res.json({ "game" : game._id });
         } else {
@@ -85,9 +119,8 @@ router.get("/code/:code", async (req, res) => {
     }
 });
 
-router.get("/cancel", async (req, res) => {
-    let user = await findUserByUsername(req.cookies.username);
-    let game = await userInGame(user._id);
+router.get("/cancel", ensureAuthenticated, async (req, res) => {
+    let game = await userInGame(req.user._id);
     game = await deleteGame(game._id);
     if (game) {
         res.json({ "result" : "success" })
@@ -98,12 +131,21 @@ router.get("/cancel", async (req, res) => {
 
 router.get("/logout", (req, res) => {
     try {
-        res.clearCookie("username");
-        res.json({ "result" : "success"});
+        res.clearCookie("isNewUser");
+        req.logout({}, error => {
+            if (error) {
+                console.error(error.message);
+                res.json({ "result" : "error"});
+            } else {
+                res.json({ "result" : "success"});
+            }
+        });
     } catch (error) {
         console.error(error.message);
         res.json({ "result" : "error"});;
     }
 });
+
+
 
 module.exports = router;

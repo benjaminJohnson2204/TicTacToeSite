@@ -22,9 +22,9 @@ const findUserByID = async (userID) => {
     
 }
 
-const addUser = async (username) => {
+const addUser = async (username, password) => {
     try {
-        let user = new User({username : username});
+        let user = new User({username : username, password : password});
         await user.save();
         return user;
     } catch (error) {

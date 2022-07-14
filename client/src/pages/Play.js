@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router";
 import { withCookies } from "react-cookie";
 import SiteHeader from "../components/SiteHeader";
+import ensureAuthenticated from "../util/ensureAuthenticated";
+import fetchEndpoint from "../util/fetchEndpoint";
 
 const socket = io("/play");
 
@@ -10,31 +12,38 @@ function Play(props) {
     const { gameID } = useParams();
     const [game, setGame] = useState(null);
     const navigate = useNavigate();
-    const username = props.cookies.get("username");
-    const userID = props.cookies.get("userID");
+    const [user, setUser] = useState(null);
+
 
     // Only emit the join message once. Don't want to make an infinite feedback loop of 
     // sending a join message, getting an update, updating, re-rendering, sending a message, etc.
     useEffect(() => {
-        if (!username || !userID) {
-            navigate("/");
-        }
+        fetchEndpoint("/api/user")
+        .then(data => {
+            if (data.user) {
+                setUser(data.user);
 
-        socket.emit("join", { 
-            id : gameID,
-            username : username
+                socket.emit("join", { 
+                    id : gameID,
+                    username : data.user.username
+                });
+            }
         });
+
         socket.on("game update", message => {
             console.log("game update", message);
             setGame(message);
         });
     }, []);
+    
+    useEffect(() => {
+        const auth = async() => {
+            await ensureAuthenticated(navigate);
+        };
+        auth();
+    });
 
-    if (!username || !userID) {
-        navigate("/");
-    }
-
-    if (!game) {
+    if (!game || !user) {
         return (
             <div className="page">
                 <SiteHeader />
@@ -48,13 +57,13 @@ function Play(props) {
         <div className="page">
             <SiteHeader />
             <h1 className="title">{game.winnerID ? "Game Over" : "Playing Tic-tac-toe"}</h1>
-            <h2 className="subtitle">{game.winnerID ? "" : userID === game.turn ? "Your turn" : "Opponent's turn"}</h2>
+            <h2 className="subtitle">{game.winnerID ? "" : user._id === game.turn ? "Your turn" : "Opponent's turn"}</h2>
                 <div className="row columns">
                     <div className="button">
-                        {game.winnerID == userID && <h2 className="victor">Winner!</h2>}
-                        <h1>{username} (you)</h1>
+                        {game.winnerID == user._id && <h2 className="victor">Winner!</h2>}
+                        <h1>{user.username} (you)</h1>
                         <h2 className="subtitle">
-                            {game.firstPlayer === userID ? "X" : "O" /* X always moves first*/}
+                            {game.firstPlayer === user._id ? "X" : "O" /* X always moves first*/}
                         </h2>
                     </div>
                     <div className="button">
@@ -66,10 +75,10 @@ function Play(props) {
                                         {game.squares.slice(3 * i, 3 * i + 3).map((square, col) => (
                                             <td className="box" onClick={() => {
                                                 if (!game.winnerID) {
-                                                    socket.emit("move", {gameID : gameID, username : username, row : i, col : col});
+                                                    socket.emit("move", {gameID : gameID, username : user.username, row : i, col : col});
                                                 }
                                             }}>
-                                                {square ? (((square === userID) ^ (game.firstPlayer === userID)) ? "O" : "X") : ""}
+                                                {square ? (((square === user._id) ^ (game.firstPlayer === user._id)) ? "O" : "X") : ""}
                                                 </td>
                                         ))}
                                     </tr>
@@ -78,10 +87,10 @@ function Play(props) {
                         </table>
                     </div>
                     <div className="button">
-                        {game.userIDs.includes(game.winnerID) && game.winnerID != userID && <h2 className="victor">Winner!</h2>}
-                        <h1>{game.usernames.filter(uname => uname != username)[0]} (opponent)</h1>
+                        {game.userIDs.includes(game.winnerID) && game.winnerID != user._id && <h2 className="victor">Winner!</h2>}
+                        <h1>{game.usernames.filter(uname => uname != user.username)[0]} (opponent)</h1>
                         <h2 className="subtitle">
-                            {game.firstPlayer === userID ? "O" : "X"}
+                            {game.firstPlayer === user._id ? "O" : "X"}
                         </h2>
                     </div>
                 </div>

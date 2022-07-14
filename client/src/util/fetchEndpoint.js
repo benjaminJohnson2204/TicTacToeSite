@@ -1,4 +1,4 @@
-export default function fetchEndpoint(endpointName, after) {
+export default function fetchEndpoint(endpointName) {
     return fetch(endpointName, {
         credentials : "include"
     })

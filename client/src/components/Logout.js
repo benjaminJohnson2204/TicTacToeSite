@@ -10,7 +10,7 @@ export default function Logout(props) {
             fetchEndpoint("/api/logout")
             .then(data => {
                 if (data.result === "success") {
-                    navigate("/");
+                    navigate("/login");
                 } else {
                     console.log("error: could not logout");
                 }

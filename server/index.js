@@ -4,6 +4,12 @@ dotenv.config({ path : path.join(__dirname, ".env")});
 
 const express = require("express");
 const cookieParser = require("cookie-parser");
+const bodyParser = require("body-parser");
+
+const bcrypt = require("bcrypt");
+const passport = require("passport");
+const LocalStrategy = require("passport-local");
+const session = require("express-session");
 const testRunner = require("../test-runner");
 
 const app = express();
@@ -18,12 +24,49 @@ const io = new Server(server);
 const mongoose = require("mongoose");
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true});
 
-const { findUserByUsername, addUser } = require("../db/services/user");
+const { findUserByUsername, addUser, findUserByID } = require("../db/services/user");
 const { addUserToGame, createGame, userInGame, joinRandomGame, findGameByID, insertSquare, switchTurns, checkForWinner, isSquareAvailable, checkForTie } = require("../db/services/game");
+const { range } = require("lodash");
 
 app.use(cookieParser());
 
+
+app.use(bodyParser.urlencoded({ extended : true}));
+app.use(bodyParser.json());
+
 app.use(express.static(path.resolve(__dirname, "../client/build")));
+
+app.use(session({
+    secret : process.env.SESSION_SECRET,
+    resave : true,
+    saveUninitialized : true,
+    cookie : { secure : false}
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.serializeUser((user, done) => {
+    done(null, user._id);
+});
+
+passport.deserializeUser(async (id, done) => {
+    let user = await findUserByID(id);
+    done(null, user);
+})
+
+passport.use(new LocalStrategy(
+    async (username, password, done) => {
+        let user = await findUserByUsername(username);
+        if (!user) {
+            return done(null, false);
+        }
+        if (!bcrypt.compareSync(password, user.password)) {
+            return done(null, false);
+        }
+        return done(null, user);
+    }
+))
 
 app.use("/api", require("../routes"));
 
@@ -84,3 +127,5 @@ server.listen(PORT, () => {
         testRunner.run();
     }, 3500);
 });
+
+module.exports = app;

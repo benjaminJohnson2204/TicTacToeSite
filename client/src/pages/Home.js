@@ -6,14 +6,28 @@ import CreateGame from "../components/CreateGame";
 import JoinRandomGame from "../components/JoinRandomGame";
 import JoinGameByCode from "../components/JoinGameByCode";
 import SiteHeader from "../components/SiteHeader";
+import fetchEndpoint from "../util/fetchEndpoint";
+import ensureAuthenticated from "../util/ensureAuthenticated";
 
-function LoggedIn(props) {
-    const [searchParams, setSearchParams] = useSearchParams();
-    const [error, setError] = useState("");
+function Home(props) {
+    const [error, setError] = useState(null);
+    const [user, setUser] = useState(null);
    
-    const username = props.cookies.get("username");
-    const isNewUser = searchParams.get("isNewUser");
+    const isNewUser = props.cookies.get("isNewUser");
     const navigate = useNavigate();
+
+    useEffect(() => {        
+        const auth = async() => {
+            await ensureAuthenticated(navigate);
+            if (!user) {
+                let data = await fetchEndpoint("/api/user");
+                if (data.user) {
+                    setUser(data.user);
+                }
+            }
+        };
+        auth();
+    });
 
     const joinGame = data => {
         if (data.error || !data.game) {
@@ -28,19 +42,15 @@ function LoggedIn(props) {
         }
     };
 
-    if (!props.cookies.get("username") || !props.cookies.get("userID")) {
-        navigate("/");
-    }
-
     return <div className="page">
-        <SiteHeader />
+        <SiteHeader homeDisabled={true}/>
         <h1 className="title">
-                {isNewUser == "true" ? ("Thanks for registering, " + username) : ("Welcome back, " + username)}
+                {!user ? "Loading..." : isNewUser === "true" ? ("Thanks for registering, " + user.username) : ("Welcome back, " + user.username)}
         </h1>
         <h2 className="subtitle">
             Choose an option to start playing!
         </h2>
-        {error && <h4 className="text-danger">{error}</h4>}
+        <h4 className="text-danger">{error}</h4>
         <div className="row columns">
             <CreateGame handleData={data => {
                     if (data.error || !data.code) {
@@ -59,4 +69,4 @@ function LoggedIn(props) {
     </div>
 }
 
-export default withCookies(LoggedIn);
+export default withCookies(Home);

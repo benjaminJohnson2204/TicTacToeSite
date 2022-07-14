@@ -2,21 +2,17 @@ import { useEffect } from "react";
 import { withCookies } from "react-cookie";
 import { useNavigate } from "react-router";
 import fetchEndpoint from "../util/fetchEndpoint";
+import ensureAuthenticated from "../util/ensureAuthenticated";
 
 function CreateGame(props) {
     const navigate = useNavigate();
 
-    if (!props.cookies.get("username") || !props.cookies.get("userID")) {
-        navigate("/");
-    }
-
     return (
         <div className="button">
-            <button className="btn btn-large btn-primary" onClick={event => {
+            <button className="btn btn-large btn-primary" onClick={async event => {
                 event.preventDefault(); 
-                if (!props.cookies.get("username") || !props.cookies.get("userID")) {
-                    navigate("/");
-                }
+
+                await ensureAuthenticated(navigate);
 
                 fetchEndpoint("/api/create")
                 .then(props.handleData);

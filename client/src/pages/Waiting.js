@@ -3,6 +3,7 @@ import { withCookies } from "react-cookie";
 import { useNavigate, useParams } from "react-router-dom";
 import io from "socket.io-client"
 import SiteHeader from "../components/SiteHeader";
+import ensureAuthenticated from "../util/ensureAuthenticated";
 import fetchEndpoint from "../util/fetchEndpoint";
 
 
@@ -14,24 +15,23 @@ function Waiting(props) {
     const { code } = useParams();
     const navigate = useNavigate();
 
-    useEffect(() => {
-        if (!props.cookies.get("username") || !props.cookies.get("userID")) {
-            navigate("/");
-        }
+    useEffect(() => {        
+        const auth = async() => {
+            await ensureAuthenticated(navigate);
+        };
+        auth();
+    })
 
+    useEffect(() => {
         socket.emit("join", { 
             creator : true,
             id : code
         });
-
-        socket.on("join", message => {
-            if (!props.cookies.get("username") || !props.cookies.get("userID")) {
-                navigate("/");
-            } else {
-                navigate("/play/" + code);
-            }
+        socket.on("join", async message => {
+            await ensureAuthenticated(navigate);
+            navigate("/play/" + code);
         });
-    });
+    }, []);
 
     return (
         <div className="page">
