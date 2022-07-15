@@ -26,7 +26,6 @@ mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true});
 
 const { findUserByUsername, addUser, findUserByID } = require("../db/services/user");
 const { addUserToGame, createGame, userInGame, joinRandomGame, findGameByID, insertSquare, switchTurns, checkForWinner, isSquareAvailable, checkForTie } = require("../db/services/game");
-const { range } = require("lodash");
 
 app.use(cookieParser());
 
