@@ -68,7 +68,7 @@ passport.use(new LocalStrategy(
     }
 ))
 
-app.use("/api", require("../routes"));
+app.use("/api", require("./routes"));
 
 app.get("*", (req, res) => {
     res.sendFile(path.resolve(__dirname, "../client/build", "index.html"));

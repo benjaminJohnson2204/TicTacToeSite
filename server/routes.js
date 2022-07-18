@@ -2,9 +2,9 @@ const router = require("express").Router();
 const bcrypt = require("bcrypt");
 const passport = require("passport");
 
-const { findUserByUsername, addUser, findUserByID } = require("./db/services/user");
-const { addUserToGame, createGame, userInGame, joinRandomGame, findGameByID, insertSquare, switchTurns, checkForWinner, isSquareAvailable, checkForTie, deleteGame, findGamesByUser } = require("./db/services/game");
-const { Status } = require("./db/models/game");
+const { findUserByUsername, addUser, findUserByID } = require("../db/services/user");
+const { addUserToGame, createGame, userInGame, joinRandomGame, findGameByID, insertSquare, switchTurns, checkForWinner, isSquareAvailable, checkForTie, deleteGame, findGamesByUser } = require("../db/services/game");
+const { Status } = require("../db/models/game");
 
 const ensureAuthenticated = (req, res, next) => {
     if (req.isAuthenticated()) {
