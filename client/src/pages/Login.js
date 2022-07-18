@@ -1,8 +1,7 @@
 import "../App.css"
 
-import { Link, useSearchParams, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
-import EnterUsername from "../components/EnterUsername";
 import { useEffect, useState } from "react";
 import { withCookies } from "react-cookie";
 import fetchEndpoint from "../util/fetchEndpoint";

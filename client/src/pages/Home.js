@@ -1,6 +1,6 @@
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useEffect ,useState } from "react";
-import { useCookies, withCookies } from "react-cookie";
+import { withCookies } from "react-cookie";
 import io from "socket.io-client";
 import CreateGame from "../components/CreateGame";
 import JoinRandomGame from "../components/JoinRandomGame";

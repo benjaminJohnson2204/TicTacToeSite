@@ -60,7 +60,7 @@ function Play(props) {
             <h2 className="subtitle">{game.winnerID ? "" : user._id === game.turn ? "Your turn" : "Opponent's turn"}</h2>
                 <div className="row columns">
                     <div className="button">
-                        {game.winnerID == user._id && <h2 className="victor">Winner!</h2>}
+                        {game.winnerID === user._id && <h2 className="victor">Winner!</h2>}
                         <h1>{user.username} (you)</h1>
                         <h2 className="subtitle">
                             {game.firstPlayer === user._id ? "X" : "O" /* X always moves first*/}
@@ -87,8 +87,8 @@ function Play(props) {
                         </table>
                     </div>
                     <div className="button">
-                        {game.userIDs.includes(game.winnerID) && game.winnerID != user._id && <h2 className="victor">Winner!</h2>}
-                        <h1>{game.usernames.filter(uname => uname != user.username)[0]} (opponent)</h1>
+                        {game.userIDs.includes(game.winnerID) && game.winnerID !== user._id && <h2 className="victor">Winner!</h2>}
+                        <h1>{game.usernames.filter(uname => uname !== user.username)[0]} (opponent)</h1>
                         <h2 className="subtitle">
                             {game.firstPlayer === user._id ? "O" : "X"}
                         </h2>
