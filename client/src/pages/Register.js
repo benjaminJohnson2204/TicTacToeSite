@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import fetchEndpoint from "../util/fetchEndpoint";
+import SiteHeader from "../components/SiteHeader";
 
 export default function Register(props) {
     const [error, setError] = useState(null);
@@ -17,6 +18,7 @@ export default function Register(props) {
 
     return (
         <div className="page">
+        <SiteHeader homeDisabled={true} logoutDisabled={true} />
             <div className="title">
                 <h1>Register</h1>
             </div>

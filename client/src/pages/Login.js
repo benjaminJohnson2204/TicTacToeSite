@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { withCookies } from "react-cookie";
 import fetchEndpoint from "../util/fetchEndpoint";
+import SiteHeader from "../components/SiteHeader";
 
 function Login(props) {
     const [error, setError] = useState(false);
@@ -22,6 +23,7 @@ function Login(props) {
 
     return (
         <div className="page">
+            <SiteHeader homeDisabled={true} logoutDisabled={true} />
             <div className="title">
                 <h1>Login</h1>
             </div>
