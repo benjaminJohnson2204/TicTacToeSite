@@ -18,7 +18,7 @@ const { addUser } = require("../db/services/user");
 const assert = chai.assert;
 const path = require("path");
 const dotenv = require("dotenv");
-dotenv.config({ path: path.join("server", ".env") });
+dotenv.config({ path: ".env" });
 
 describe("Database Tests", () => {
   before(() =>
