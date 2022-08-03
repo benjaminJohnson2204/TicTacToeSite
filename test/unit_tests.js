@@ -18,12 +18,13 @@ const { addUser } = require("../db/services/user");
 const assert = chai.assert;
 const path = require("path");
 const dotenv = require("dotenv");
-dotenv.config({ path: ".env" });
+dotenv.config({ path: path.join(__dirname, ".env") });
 
 describe("Database Tests", () => {
   before(() =>
     mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true })
   );
+  after(() => process.exit());
 
   var user1, user2, game, game2;
   it("Create users", async () => {
