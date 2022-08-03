@@ -8,6 +8,7 @@
     "start": "node server/index.js && cd client && npm run start",
     "build": "cd client && npm install && npm run build",
     "format": "prettier --write .",
+    "lint-check": "eslint --cache --report-unused-disable-directives .",
     "prettier-check": "prettier --check ."
   },
   "repository": {
