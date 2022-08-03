@@ -7,7 +7,8 @@
     "test": "mocha",
     "start": "node server/index.js && cd client && npm run start",
     "build": "cd client && npm install && npm run build",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "prettier-check": "prettier --check ."
   },
   "repository": {
     "type": "git",
