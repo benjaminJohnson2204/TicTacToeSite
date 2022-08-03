@@ -9,6 +9,7 @@ export default function Chat(props) {
     props.socket.on("chat message", (message) => {
       receiveChatMessage(message);
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleChange = (event) => {
