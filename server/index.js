@@ -139,6 +139,10 @@ io.of("/play").on("connection", (socket) => {
     }
   });
 
+  socket.on("chat message", async (message) => {
+    io.of("/play").to(message.gameID).emit("chat message", message);
+  });
+
   socket.on("disconnecting", async (_reason) => {
     for (let room of socket.rooms) {
       if (room !== socket.id) {

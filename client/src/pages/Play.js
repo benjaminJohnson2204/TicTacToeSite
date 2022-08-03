@@ -2,6 +2,7 @@ import io from "socket.io-client";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router";
 import { withCookies } from "react-cookie";
+import Chat from "../components/Chat";
 import SiteHeader from "../components/SiteHeader";
 import ensureAuthenticated from "../util/ensureAuthenticated";
 import fetchEndpoint from "../util/fetchEndpoint";
@@ -81,6 +82,7 @@ function Play(props) {
       </h2>
       <div className="row columns">
         <div className="button">
+          <Chat gameID={gameID} user={user} socket={socket} />
           {game.winnerID === user._id && <h2 className="victor">Winner!</h2>}
           <h1>{user.username} (you)</h1>
           <h2 className="subtitle">
