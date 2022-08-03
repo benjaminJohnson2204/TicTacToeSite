@@ -23,16 +23,8 @@ const io = new Server(server);
 const mongoose = require("mongoose");
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true });
 
+const { findUserByUsername, findUserByID } = require("../db/services/user");
 const {
-  findUserByUsername,
-  addUser,
-  findUserByID,
-} = require("../db/services/user");
-const {
-  addUserToGame,
-  createGame,
-  userInGame,
-  joinRandomGame,
   findGameByID,
   insertSquare,
   switchTurns,
@@ -147,7 +139,7 @@ io.of("/play").on("connection", (socket) => {
     }
   });
 
-  socket.on("disconnecting", async (reason) => {
+  socket.on("disconnecting", async (_reason) => {
     for (let room of socket.rooms) {
       if (room !== socket.id) {
         socket.to(room).emit("opponent disconnected");

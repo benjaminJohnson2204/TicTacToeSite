@@ -1,0 +1,65 @@
+{
+  "env": {
+    "amd": true,
+    "browser": true,
+    "es2021": true,
+    "mocha": true,
+    "node": true
+  },
+  "extends": ["eslint:recommended", "plugin:react/recommended"],
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "ecmaVersion": "latest"
+  },
+  "plugins": ["react"],
+  "ignorePatterns": ["*.config.js", "node_modules/*", "client/build/*"],
+  "rules": {
+    "indent": "off",
+    "object-shorthand": "off",
+    "no-unused-vars": [
+      "error",
+      {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_"
+      }
+    ],
+    "func-style": [
+      "error",
+      "declaration",
+      {
+        "allowArrowFunctions": true
+      }
+    ],
+    "space-before-function-paren": [
+      "error",
+      {
+        "anonymous": "never",
+        "named": "never",
+        "asyncArrow": "always"
+      }
+    ],
+    "arrow-parens": "off",
+    "no-confusing-arrow": "off",
+    "object-curly-newline": "off",
+    "no-plusplus": "off",
+    "operator-linebreak": "off",
+    "no-mixed-operators": "off",
+    "max-len": "off",
+    "react/jsx-filename-extension": [
+      "error",
+      {
+        "extensions": [".tsx"]
+      }
+    ],
+    "react/jsx-tag-spacing": "off",
+    "arrow-body-style": "off",
+    "semi": "off",
+    "react/prop-types": "off",
+    "react/jsx-one-expression-per-line": "off",
+    "global-require": "off",
+    "no-nested-ternary": "off",
+    "react/display-name": "off"
+  }
+}

@@ -1,6 +1,5 @@
 const { User } = require("../models/user");
 const { Game, Status } = require("../models/game");
-const { findUserByUsername } = require("./user");
 
 const flipACoin = () => Math.random() < 0.5;
 

@@ -12,12 +12,6 @@ const {
   createGame,
   userInGame,
   joinRandomGame,
-  findGameByID,
-  insertSquare,
-  switchTurns,
-  checkForWinner,
-  isSquareAvailable,
-  checkForTie,
   deleteGame,
   findGamesByUser,
 } = require("../db/services/game");
@@ -60,7 +54,6 @@ router.post(
     if (addedUser) {
       req.login(addedUser, (error) => {
         if (error) {
-          console.log(error);
           return next(error);
         }
         return next(null, addedUser);

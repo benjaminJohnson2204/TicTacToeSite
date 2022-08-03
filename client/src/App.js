@@ -1,8 +1,7 @@
-import logo from "./logo.svg";
 import "./App.css";
 
 import React from "react";
-import { BrowserRouter as Router, Link, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { CookiesProvider } from "react-cookie";
 
 import Login from "./pages/Login";
