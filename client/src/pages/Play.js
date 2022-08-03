@@ -9,10 +9,13 @@ import fetchEndpoint from "../util/fetchEndpoint";
 const socket = io("/play");
 
 function Play(props) {
-    const { gameID } = useParams();
-    const [game, setGame] = useState(null);
     const navigate = useNavigate();
+    const { gameID } = useParams();
+
+    const [game, setGame] = useState(null);
     const [user, setUser] = useState(null);
+    const [opponentDisconnected, setOpponentDisconnected] = useState(false);
+    const [opponentReconnected, setOpponentReconnected] = useState(false);
 
 
     // Only emit the join message once. Don't want to make an infinite feedback loop of 
@@ -27,11 +30,22 @@ function Play(props) {
                     id : gameID,
                     username : data.user.username
                 });
+
+                socket.on("opponent disconnected", message => {
+                    setOpponentDisconnected(true);
+                    setOpponentReconnected(false);
+                });
+
+                socket.on("opponent reconnected", message => {
+                    if (message.username !== data.user.username) {
+                        setOpponentReconnected(true);
+                        setOpponentDisconnected(false);
+                    }
+                });
             }
         });
 
         socket.on("game update", message => {
-            console.log("game update", message);
             setGame(message);
         });
     }, []);
@@ -92,6 +106,8 @@ function Play(props) {
                         <h2 className="subtitle">
                             {game.firstPlayer === user._id ? "O" : "X"}
                         </h2>
+                        {opponentReconnected && <h4 className="text-success">Your opponent has reconnected!</h4>}
+                        {opponentDisconnected && <h4 className="text-danger">Your opponent has disconnected!</h4>}
                     </div>
                 </div>
         </div>

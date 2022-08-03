@@ -26,6 +26,7 @@ mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true});
 
 const { findUserByUsername, addUser, findUserByID } = require("../db/services/user");
 const { addUserToGame, createGame, userInGame, joinRandomGame, findGameByID, insertSquare, switchTurns, checkForWinner, isSquareAvailable, checkForTie } = require("../db/services/game");
+const { Status } = require("../db/models/game");
 
 app.use(cookieParser());
 
@@ -85,14 +86,15 @@ io.of("/waiting").on("connection", socket => {
 });
 
 io.of("/play").on("connection", socket => {
-    var usernames = [];
-
     socket.on("join", async message => {
-        usernames.push(message.username);
         socket.join(message.id);
         let game = await findGameByID(message.id);
+        if (game.status === Status.PLAYING && game.usernames.includes(message.username)) { // Reconnecting
+            io.of("/play").to(message.id).emit("opponent reconnected", {"username" : message.username});
+        }
         io.of("/play").to(message.id).emit("game update", game);
     });
+
     socket.on("move", async message => {
         let user = await findUserByUsername(message.username);
         let game = await findGameByID(message.gameID);
@@ -115,7 +117,15 @@ io.of("/play").on("connection", socket => {
         } else {
             io.of("/play").to(message.gameID).emit("game update", gameSwitchedTurns);
         }
-    })
+    });
+
+    socket.on("disconnecting", async reason => {
+        for (let room of socket.rooms) {
+            if (room !== socket.id) {
+                socket.to(room).emit("opponent disconnected");
+            }
+        }
+    });
 })
 
 
