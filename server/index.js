@@ -10,7 +10,6 @@ const bcrypt = require("bcrypt");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const session = require("express-session");
-const testRunner = require("../test-runner");
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -159,7 +158,4 @@ io.of("/play").on("connection", (socket) => {
 
 server.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
-  setTimeout(() => {
-    testRunner.run();
-  }, 3500);
 });

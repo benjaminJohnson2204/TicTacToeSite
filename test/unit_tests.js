@@ -1,5 +1,6 @@
 const chai = require("chai");
 const { Status } = require("../db/models/game");
+const mongoose = require("mongoose");
 const {
   createGame,
   addUserToGame,
@@ -15,10 +16,17 @@ const {
 } = require("../db/services/game");
 const { addUser } = require("../db/services/user");
 const assert = chai.assert;
+const path = require("path");
+const dotenv = require("dotenv");
+dotenv.config({ path: path.join("server", ".env") });
 
-suite("Database Tests", () => {
+describe("Database Tests", () => {
+  before(() =>
+    mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true })
+  );
+
   var user1, user2, game, game2;
-  test("Create users", async () => {
+  it("Create users", async () => {
     user1 = await addUser("test-1");
     user2 = await addUser("test-2");
     assert.isNotNull(user1);
@@ -27,7 +35,7 @@ suite("Database Tests", () => {
     assert.equal(user2.username, "test-2");
   });
 
-  test("Add users to game", async () => {
+  it("Add users to game", async () => {
     game = await createGame(user1._id.toString());
     assert.equal(game.status, Status.WAITING);
 
@@ -40,7 +48,7 @@ suite("Database Tests", () => {
     assert.include([user1._id.toString(), user2._id.toString()], game.turn);
   });
 
-  test("Detect that users are in game", async () => {
+  it("Detect that users are in game", async () => {
     let user1Game = await userInGame(user1._id.toString());
     let user2Game = await userInGame(user2._id.toString());
     assert.isOk(user1Game);
@@ -48,7 +56,7 @@ suite("Database Tests", () => {
     assert.isTrue(user1Game.equals(user2Game));
   });
 
-  test("Check that squares are available", async () => {
+  it("Check that squares are available", async () => {
     for (let i = 0; i < 9; i++) {
       assert.isTrue(
         await isSquareAvailable(game._id, Math.floor(i / 3), i % 3)
@@ -56,18 +64,18 @@ suite("Database Tests", () => {
     }
   });
 
-  test("Insert square", async () => {
+  it("Insert square", async () => {
     game = await insertSquare(game._id, game.turn, 0, 0);
     assert.isOk(game);
     assert.equal(game.turn, game.squares[0]);
   });
 
-  test("Switch turns", async () => {
+  it("Switch turns", async () => {
     game = await switchTurns(game._id);
     assert.notEqual(game.turn, game.squares[0]);
   });
 
-  test("Check for winner", async () => {
+  it("Check for winner", async () => {
     game = await insertSquare(game._id, game.turn, 1, 1);
     game = await switchTurns(game._id);
     game = await insertSquare(game._id, game.turn, 0, 1);
@@ -82,20 +90,20 @@ suite("Database Tests", () => {
     assert.equal(game.winnerID, game.turn);
   });
 
-  test("Delete game", async () => {
+  it("Delete game", async () => {
     game = await deleteGame(game._id);
     assert.isOk(game);
     game = await findGameByID(game._id);
     assert.isNotOk(game);
   });
 
-  test("Create new game", async () => {
+  it("Create new game", async () => {
     game2 = await createGame(user1._id.toString());
     game2 = await addUserToGame(game2._id, user2._id.toString());
     assert.isOk(game2);
   });
 
-  test("Fill up new game board", async () => {
+  it("Fill up new game board", async () => {
     game2 = await insertSquare(game2._id, user1._id.toString(), 0, 0);
     game2 = await insertSquare(game2._id, user2._id.toString(), 0, 1);
     game2 = await insertSquare(game2._id, user1._id.toString(), 2, 0);
@@ -108,13 +116,13 @@ suite("Database Tests", () => {
     assert.isOk(game2);
   });
 
-  test("Game 2 is not won", async () => {
+  it("Game 2 is not won", async () => {
     game2 = await checkForWinner(game2._id);
     assert.isOk(game2);
     assert.isNotOk(game2.winnerID);
   });
 
-  test("Check for tie", async () => {
+  it("Check for tie", async () => {
     game2 = await checkForTie(game2._id);
     assert.isOk(game2);
     assert.equal(game2.status, Status.FINISHED);
@@ -122,7 +130,7 @@ suite("Database Tests", () => {
     assert.equal(game2.winnerID, "tie");
   });
 
-  test("Join random game", async () => {
+  it("Join random game", async () => {
     game = await createGame(user1._id);
     let randomGame = await joinRandomGame(user2._id);
     assert.isOk(randomGame);
