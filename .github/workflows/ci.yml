@@ -8,7 +8,7 @@ jobs:
       - name: Clone
         uses: actions/checkout@v2
       - name: Install Dependencies
-        uses: npm ci
+        run: npm ci
       - name: Unit Tests
         run: npm run test
       - name: Formatting
