@@ -1,16 +1,16 @@
-import logo from './logo.svg';
-import './App.css';
+import logo from "./logo.svg";
+import "./App.css";
 
 import React from "react";
 import { BrowserRouter as Router, Link, Routes, Route } from "react-router-dom";
 import { CookiesProvider } from "react-cookie";
 
-import Login from './pages/Login';
-import Register from './pages/Register'
-import WaitingPage from './pages/Waiting';
-import Home from "./pages/Home"
-import Play from './pages/Play';
-import CompletedGames from './pages/CompletedGames';
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import WaitingPage from "./pages/Waiting";
+import Home from "./pages/Home";
+import Play from "./pages/Play";
+import CompletedGames from "./pages/CompletedGames";
 
 function App() {
   return (
