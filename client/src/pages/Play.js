@@ -46,6 +46,7 @@ function Play(props) {
     socket.on("game update", (message) => {
       setGame(message);
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

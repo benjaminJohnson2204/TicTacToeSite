@@ -28,6 +28,7 @@ function Waiting(props) {
       await ensureAuthenticated(navigate);
       navigate("/play/" + code);
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

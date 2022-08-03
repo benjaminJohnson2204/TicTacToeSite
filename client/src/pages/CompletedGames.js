@@ -14,6 +14,7 @@ export default function CompletedGames(props) {
     fetchEndpoint("/api/games").then((data) => {
       setGames(data.games);
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

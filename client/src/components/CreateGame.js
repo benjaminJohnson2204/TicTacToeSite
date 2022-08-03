@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { withCookies } from "react-cookie";
 import { useNavigate } from "react-router";
 import fetchEndpoint from "../util/fetchEndpoint";
